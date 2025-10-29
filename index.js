@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const env = require("dotenv");
 env.config();
-const PORT = process.env.Port || 8015;
+const PORT = process.env.Port || 9006;
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
 
 const connectDb = require("./config/dbconfig");
@@ -33,7 +33,12 @@ env.config();
 mongoose.set("strictQuery", true);
 connectDb();
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.PROD_FRONTEND || "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(morgan("dev"));
 app.get("/", (_, res) => {
   res.send("server is running and ok");
@@ -52,9 +57,8 @@ app.use("/api/career", careerRoute);
 app.use("/api/quotes", quoterouter);
 app.use("/api/contact", contactRoute);
 app.use("/api/iot/prodcuts", iotRoutes);
-app.use("/api/iot/quote" ,iotQuoteRoute);
+app.use("/api/iot/quote", iotQuoteRoute);
 app.use("/api/blog", blogRoute);
-
 
 const filePath = path.join(__dirname, "uploads");
 app.use("/images", express.static(filePath));
@@ -68,4 +72,3 @@ app.listen(PORT, () => {
 // app.listen(PORT, "127.0.0.1", () => {
 //   console.log(`App is running on http://127.0.0.1:${PORT}/api`);
 // });
-
